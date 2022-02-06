@@ -6,12 +6,14 @@
 //
 
 import SwiftUI
-
+import Foundation
 
 
 struct ContentView: View {
 	@State private var sleepAmount: Double  = 0
 	@State private var wakeUp = Date.now
+	
+	
 	
     var body: some View {
 		 VStack{
@@ -26,6 +28,11 @@ struct ContentView: View {
 	func exampleDates(){
 		let tomorrow = Date.now.addingTimeInterval(86400)
 		let range = Date.now...tomorrow
+		
+		var components = DateComponents()
+		components.hour = 8
+		components.minute = 0
+		let date = Calendar.current.date(from: components) ?? Date.now
 	}
 }
 
