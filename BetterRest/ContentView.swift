@@ -27,35 +27,55 @@ struct ContentView: View {
     var body: some View {
 		 NavigationView {
 			 Form{
-				 VStack(alignment: .leading, spacing: 0){
-					 Text("When do you want to wake up?")
-						 .font(.headline)
+				 Section("When do you want to wake up?"){
 					 DatePicker("Please enter a time", selection: $wakeUp, displayedComponents: .hourAndMinute)
 						 .labelsHidden()
+						 .onChange(of: wakeUp) { _ in
+							 calculateBedtime()
+						 }
 				 }
-				 VStack(alignment: .leading, spacing: 0){
-					 Text("Desired amount of sleep")
-						 .font(.headline)
-					 
+				 Section("Desired amount of sleep"){
 					 Stepper("\(sleepAmount.formatted()) hours", value: $sleepAmount, in: 4...12, step: 0.25)
+						 .onChange(of: sleepAmount) { _ in
+							 calculateBedtime()
+						 }
 				 }
-				 VStack(alignment: .leading, spacing: 0){
-					 Text("Daily coffee intake")
-						 .font(.headline)
+				 Section("Daily coffee intake"){
+					 //Stepper(coffeeAmount == 1 ?"1 cup" : "\(coffeeAmount) cups",value:$coffeeAmount, in: 1...20)
+					 Picker(selection: $coffeeAmount) {
+						 ForEach(1...10, id: \.self){ numberOfCups in
+							 Text(numberOfCups == 1 ? "1 cup" : " \(numberOfCups) cups")
+						 }
+					 } label: {
+						 Text("Daily Coffee Intake")
+					 }
+					 .pickerStyle(.menu)
+					 .onChange(of: coffeeAmount) { _ in
+						 calculateBedtime()
+					 }
+
+				 }
+
+				 Section("Ideal Bedtime"){
+					 Text(alertTitle + alertmessage)
+						 .font(.subheadline)
+						 .lineLimit(nil)
 					 
-					 Stepper(coffeeAmount == 1 ?"1 cup" : "\(coffeeAmount) cups",value:$coffeeAmount, in: 1...20)
+					 
 				 }
 			 }
 			 .navigationTitle("Better Rest")
-			 .toolbar {
-				 Button("Calculate", action: calculateBedtime)
-			 }
-			 .alert(alertTitle, isPresented: $showingAlert){
-				 Button("OK"){}
-			 }message: {
-				 Text(alertmessage)
-			 }
-		 }
+//			 .toolbar {
+//				 Button("Calculate", action: calculateBedtime)
+//			 }
+//			 .alert(alertTitle, isPresented: $showingAlert){
+//				 Button("OK"){}
+//			 }message: {
+//				 Text(alertmessage)
+//			 }
+
+
+		 } // NavigationView
 
     }
 	
@@ -73,12 +93,13 @@ struct ContentView: View {
 			let sleepTime = wakeUp - prediction.actualSleep
 			alertTitle = "Your ideal bedtime is..."
 			alertmessage = sleepTime.formatted(date: .omitted, time:.shortened)
+			print("time is \(alertmessage)")
 		}catch{
 			alertTitle = "Error"
 			alertmessage = "Sorry, there was a problem calculating your bedtime."
 			//Something went wrong
 		}
-		showingAlert = true
+		//showingAlert = true
 	}
 	
 
